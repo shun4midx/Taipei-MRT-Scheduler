@@ -23,4 +23,7 @@ extern std::vector<std::unordered_map<Language, std::string>> O01_NAMES;
 extern std::vector<std::unordered_map<Language, std::string>> O50_NAMES;
 
 // ======== RETRIEVAL FUNCTIONS ======== //
+
+bool validStation(int line_int, int stn_num);
+
 std::string getName(int line_int, int stn_num, int lang_int = zh); // Default to Chinese
