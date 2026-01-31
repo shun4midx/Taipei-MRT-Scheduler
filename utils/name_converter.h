@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "consts.h"
+#include "basic.h"
 
 // ======== STORING INFORMATION ======== //
 extern const std::string INVALID;

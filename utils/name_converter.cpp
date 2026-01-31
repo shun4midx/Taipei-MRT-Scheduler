@@ -227,3 +227,12 @@ std::string getName(int line_int, int stn_num, int lang_int) {
         }
     }
 }
+
+bool validStation(int line_int, int stn_num) {
+    try {
+        getName(line_int, stn_num);
+        return true;
+    } catch (const std::exception& e) {
+        return false;
+    }
+}
