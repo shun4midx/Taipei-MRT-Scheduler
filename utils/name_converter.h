@@ -9,9 +9,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-
-enum Language {zh, en, jp, kr};
-enum Line {R, O, G, BL, BR, Y};
+#include "consts.h"
 
 // ======== STORING INFORMATION ======== //
 extern const std::string INVALID;
