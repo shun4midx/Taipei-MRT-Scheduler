@@ -14,6 +14,7 @@
 enum Language {zh, en, jp, kr};
 enum Line {R, O, G, BL, BR, Y};
 
+extern const std::unordered_map<Line, std::string> LINE_TO_STR;
 extern const std::unordered_map<std::string, Line> LINES;
 
 // ======== STRUCTS ========= //
@@ -41,3 +42,6 @@ Station makeStation(int line_int, int stn_num); // Returns station given relevan
 
 std::string getName(const Station& station, int lang_int = zh); // Default to Chinese
 std::string getName(int line_int, int stn_num, int lang_int = zh);
+
+Station codeToStation(std::string stn_code);
+std::string stationToCode(const Station& station);

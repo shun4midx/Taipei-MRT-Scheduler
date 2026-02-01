@@ -7,8 +7,13 @@
 
 #include "basic.h"
 #include <stdexcept>
+#include <regex>
 
 // ======== BASIC DEFINITIONS ======== //
+const std::unordered_map<Line, std::string> LINE_TO_STR = {
+    {R, "R"}, {O, "O"}, {G, "G"}, {BL, "BL"}, {BR, "BR"}, {Y, "Y"}
+};
+
 const std::unordered_map<std::string, Line> LINES = {
     {"R", R}, {"O", O}, {"G", G}, {"BL", BL}, {"BR", BR}, {"Y", Y}
 };
@@ -259,4 +264,36 @@ std::string getName(int line_int, int stn_num, int lang_int) {
             throw std::invalid_argument("getName: No such station");
         }
     }
+}
+
+Station codeToStation(std::string stn_code) {
+    static const std::regex re(R"(^([A-Z]{1,2})([0-9]{2})$)");
+    std::smatch m;
+
+    if (!std::regex_match(stn_code, m, re)) {
+        throw std::invalid_argument("Invalid station code: " + stn_code);
+    }
+
+    std::string line_str = m[1]; // "BL"
+    int stn_num = std::stoi(m[2]); // 23
+
+    if (LINES.find(line_str) == LINES.end()) {
+        throw std::invalid_argument("Invalid line code: " + line_str);
+    } else {
+        Line line = LINES.at(line_str);
+
+        if (!validStation(line, stn_num)) {
+            throw std::invalid_argument("Invalid station number for this line: " + stn_code);
+        } else {
+            return Station{line, stn_num};
+        }
+    }
+}
+
+std::string stationToCode(const Station& station) {
+    if (!validStation(station)) {
+        throw std::invalid_argument("Invalid station");
+    }
+
+    return LINE_TO_STR.at(station.line) + (station.stn_num < 10 ? "0" : "") + std::to_string(station.stn_num);
 }
