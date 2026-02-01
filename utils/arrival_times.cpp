@@ -17,6 +17,66 @@
 // ======== DEFINITIONS ======== //
 const Time INVALID_TIME = Time{-1, -1};
 
+// Make the following 1-idxed
+
+// {increasing dir/nangang exhib center, decreasing dir/taipei zoo}
+
+const std::vector<std::vector<Time>> BR_FIRST_TRAINS = {
+    {INVALID_TIME, INVALID_TIME},
+    {Time{6, 0}, INVALID_TIME}, // BR01
+    {Time{6, 1}, Time{6, 4}}, // BR02
+    {Time{6, 2}, Time{6, 3}}, // BR03
+    {Time{6, 4}, Time{6, 1}}, // BR04
+    {Time{6, 0}, Time{6, 0}}, // BR05
+    {Time{6, 1}, Time{6, 3}}, // BR06
+    {Time{6, 3}, Time{6, 1}}, // BR07
+    {Time{6, 0}, Time{6, 0}}, // BR08
+    {Time{6, 1}, Time{6, 5}}, // BR09
+    {Time{6, 3}, Time{6, 3}}, // BR10
+    {Time{6, 5}, Time{6, 1}}, // BR11
+    {Time{6, 0}, Time{6, 0}}, // BR12
+    {Time{6, 2}, Time{6, 2}}, // BR13
+    {Time{6, 0}, Time{6, 0}}, // BR14
+    {Time{6, 1}, Time{6, 3}}, // BR15
+    {Time{6, 3}, Time{6, 1}}, // BR16
+    {Time{6, 0}, Time{6, 0}}, // BR17
+    {Time{6, 1}, Time{6, 5}}, // BR18
+    {Time{6, 2}, Time{6, 3}}, // BR19
+    {Time{6, 4}, Time{6, 1}}, // BR20
+    {Time{6, 0}, Time{6, 0}}, // BR21
+    {Time{6, 1}, Time{6, 3}}, // BR22
+    {Time{6, 3}, Time{6, 1}}, // BR23
+    {Time{6, 0}, INVALID_TIME} // BR24
+};
+
+const std::vector<std::vector<Time>> BR_LAST_TRAINS = {
+    {INVALID_TIME, INVALID_TIME},
+    {Time{24, 0}, INVALID_TIME}, // BR01
+    {Time{24, 1}, Time{24, 53}}, // BR02
+    {Time{24, 2}, Time{24, 52}}, // BR03
+    {Time{24, 5}, Time{24, 49}}, // BR04
+    {Time{24, 7}, Time{24, 47}}, // BR05
+    {Time{24, 10}, Time{24, 44}}, // BR06
+    {Time{24, 12}, Time{24, 42}}, // BR07
+    {Time{24, 15}, Time{24, 39}}, // BR08
+    {Time{24, 33}, Time{24, 37}}, // BR09
+    {Time{24, 35}, Time{24, 35}}, // BR10
+    {Time{24, 38}, Time{24, 32}}, // BR11
+    {Time{24, 40}, Time{24, 30}}, // BR12
+    {Time{24, 43}, Time{24, 27}}, // BR13
+    {Time{24, 46}, Time{24, 23}}, // BR14
+    {Time{24, 49}, Time{24, 20}}, // BR15
+    {Time{24, 52}, Time{24, 18}}, // BR16
+    {Time{24, 54}, Time{24, 15}}, // BR17
+    {Time{24, 56}, Time{24, 13}}, // BR18
+    {Time{24, 58}, Time{24, 11}}, // BR19
+    {Time{25, 0}, Time{24, 9}}, // BR20
+    {Time{25, 3}, Time{24, 5}}, // BR21
+    {Time{25, 5}, Time{24, 3}}, // BR22
+    {Time{25, 7}, Time{24, 1}}, // BR23
+    {INVALID_TIME, Time{24, 0}} // BR24
+};
+
 // ======== LOADING ======== //
 std::string dayGroup(const Line& line, int day_type) {
     if (day_type <= 0 || day_type > 7) {
@@ -57,6 +117,10 @@ std::vector<Train> loadStationSchedule(const Station& stn, int day_type) {
 
     if (!validStation(stn)) {
         throw std::invalid_argument("Invalid station");
+    }
+
+    if (stn.line == BR) {
+        throw std::invalid_argument("BR line stations don't have station schedules provided, we only have a rough estimate of how many minutes are between trains.");
     }
 
     // Find correct file
@@ -214,5 +278,59 @@ Time nextTrainTime(const Station& stn, int day_type, int now_mins, const Station
         return minsToTime(it->time);
     } else { // No entry with such a time
         return INVALID_TIME;
+    }
+}
+
+Time firstTrainTime(const Station& stn, int day_type, const Station& dest) {
+    if (stn.line != BR) { // Given timetable
+        // All trains begin at 6am
+        return nextTrainTime(stn, day_type, Time{6, 0}, dest);
+    } else { // Deal with it separately
+        if (!validStation(stn)) {
+            throw std::invalid_argument("Invalid station stn");
+        } else if (!validStation(dest)) {
+            throw std::invalid_argument("Invalid station dest");
+        } else if (day_type <= 0 || day_type > 7) {
+            throw std::invalid_argument("Invalid day_type: " + std::to_string(day_type));
+        } else {
+            if (stn.stn_num == dest.stn_num) {
+                throw std::invalid_argument("stn and dest are the same station");
+            }
+
+            return BR_FIRST_TRAINS[stn.stn_num][stn.stn_num < dest.stn_num ? 0 : 1];
+        }
+    }
+}
+
+Time lastTrainTime(const Station& stn, int day_type, const Station& dest) {
+    if (stn.line != BR) { // Given timetable
+        std::vector<Train> train_schedule = loadStationSchedule(stn, day_type);
+
+        if (train_schedule.empty()) {
+            return INVALID_TIME;
+        }
+
+        auto it = train_schedule.rbegin();
+
+        // Traverse from the end
+        while (!oneTrainReachDest(stn, dest, *it)) {
+            --it;
+        }
+
+        return minsToTime(it->time);
+    } else { // Deal with it separately
+        if (!validStation(stn)) {
+            throw std::invalid_argument("Invalid station stn");
+        } else if (!validStation(dest)) {
+            throw std::invalid_argument("Invalid station dest");
+        } else if (day_type <= 0 || day_type > 7) {
+            throw std::invalid_argument("Invalid day_type: " + std::to_string(day_type));
+        } else {
+            if (stn.stn_num == dest.stn_num) {
+                throw std::invalid_argument("stn and dest are the same station");
+            }
+
+            return BR_LAST_TRAINS[stn.stn_num][stn.stn_num < dest.stn_num ? 0 : 1];
+        }
     }
 }

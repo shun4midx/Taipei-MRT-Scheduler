@@ -28,7 +28,11 @@ typedef struct Time {
     int min;
 } Time;
 
+// ======== DEFINITIONS ======== //
 extern const Time INVALID_TIME;
+
+extern const std::vector<std::vector<Time>> BR_FIRST_TRAINS;
+extern const std::vector<std::vector<Time>> BR_LAST_TRAINS;
 
 // ======== LOADING ======== //
 std::string dayGroup(const Line& line, int day_type);
@@ -50,3 +54,6 @@ bool oneTrainReachDest(const Station& stn, const Station& dest, Train train);
 
 Time nextTrainTime(const Station& stn, int day_type, const Time& curr_time, const Station& dest); // Returns next arrival time in minutes, or {-1, -1} if none
 Time nextTrainTime(const Station& stn, int day_type, int now_mins, const Station& dest);
+
+Time firstTrainTime(const Station& stn, int day_type, const Station& dest);
+Time lastTrainTime(const Station& stn, int day_type, const Station& dest);
