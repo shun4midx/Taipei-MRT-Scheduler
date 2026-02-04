@@ -161,10 +161,6 @@ void printTrainSchedule(const std::vector<Train>& train_schedule) {
 }
 
 // ======== QUERY ======== //
-bool sameStation(const Station& stn1, const Station& stn2) {
-    return stn1.line == stn2.line && stn1.stn_num == stn2.stn_num;
-}
-
 bool sameTime(const Time& time1, const Time& time2) {
     return time1.hr == time2.hr && time1.min == time2.min;
 }

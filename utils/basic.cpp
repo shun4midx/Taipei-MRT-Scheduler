@@ -191,6 +191,10 @@ std::vector<std::unordered_map<Language, std::string>> O50_NAMES = {
 };
 
 // ======== RETRIEVAL FUNCTIONS ========= //
+bool sameStation(const Station& stn1, const Station& stn2) {
+    return stn1.line == stn2.line && stn1.stn_num == stn2.stn_num;
+}
+
 bool validStation(const Station& station) {
     return validStation(station.line, station.stn_num);
 }

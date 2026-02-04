@@ -43,7 +43,6 @@ std::vector<Train> loadStationSchedule(const Station& stn, int day_type); // day
 void printTrainSchedule(const std::vector<Train>& train_schedule);
 
 // ======== QUERY ======== //
-bool sameStation(const Station& stn1, const Station& stn2);
 bool sameTime(const Time& time1, const Time& time2);
 
 int timeToMins(const Time& time); // Time to mins after 00:00

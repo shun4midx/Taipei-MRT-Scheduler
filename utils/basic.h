@@ -35,6 +35,8 @@ extern std::vector<std::unordered_map<Language, std::string>> O01_NAMES;
 extern std::vector<std::unordered_map<Language, std::string>> O50_NAMES;
 
 // ======== RETRIEVAL FUNCTIONS ======== //
+bool sameStation(const Station& stn1, const Station& stn2);
+
 bool validStation(const Station& station);
 bool validStation(int line_int, int stn_num);
 
