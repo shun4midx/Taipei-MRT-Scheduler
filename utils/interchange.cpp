@@ -328,6 +328,15 @@ std::vector<std::pair<Station, int>> getTransfers(const Station& stn) {
     return TRANSFERS.at(stn.line)[stn.stn_num];
 }
 
+bool canTransfer(const Station& from, const Station& to) {
+    try {
+        getTransferTime(from, to);
+        return true;
+    } catch (std::exception e) {
+        return false;
+    }
+}
+
 int getTransferTime(const Station& from, const Station& to) {
     if (sameStation(from, to)) {
         return 0;

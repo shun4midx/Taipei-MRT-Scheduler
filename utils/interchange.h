@@ -32,6 +32,7 @@ const StationNode* getStationNode(const Station& stn); // Get physical station n
 bool isInterchange(const Station& stn); // Is stn part of an interchange
 
 std::vector<std::pair<Station, int>> getTransfers(const Station& stn); // All transfers from stn
+bool canTransfer(const Station& from, const Station& to);
 int getTransferTime(const Station& from, const Station& to); // Transfer time between two stations (-1 if none)
 
 std::vector<Station> getEquivalentStations(const Station& stn); // All equivalent station codes at same physical station
