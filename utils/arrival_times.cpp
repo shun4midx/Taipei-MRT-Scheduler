@@ -15,8 +15,6 @@
 #include <algorithm>
 
 // ======== DEFINITIONS ======== //
-const Time INVALID_TIME = Time{-1, -1};
-
 // Make the following 1-idxed
 
 // {increasing dir/nangang exhib center, decreasing dir/taipei zoo}
@@ -161,30 +159,6 @@ void printTrainSchedule(const std::vector<Train>& train_schedule) {
 }
 
 // ======== QUERY ======== //
-bool sameTime(const Time& time1, const Time& time2) {
-    return time1.hr == time2.hr && time1.min == time2.min;
-}
-
-int timeToMins(const Time& time) {
-    return time.hr * 60 + time.min;
-}
-
-Time minsToTime(int mins) {
-    if (mins < 0 || mins > 26 * 60) { // No train arrives at 2am of the next day I think
-        throw std::invalid_argument("Invalid argument: " + std::to_string(mins));
-    }
-
-    return Time{mins / 60, mins % 60};
-}
-
-std::string timeToStr(const Time& time) {
-    if (sameTime(time, INVALID_TIME)) {
-        return "INVALID_TIME";
-    }
-    
-    return (time.hr < 10 ? "0" : "") + std::to_string(time.hr) + ":" + (time.min < 10 ? "0" : "") + std::to_string(time.min);
-}
-
 bool oneTrainReachDest(const Station& stn, const Station& dest, Train train) {
     // Detect exceptions
     if (!validStation(stn)) {

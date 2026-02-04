@@ -23,8 +23,15 @@ typedef struct station {
     int stn_num;
 } Station;
 
+typedef struct Time {
+    int hr;
+    int min;
+} Time;
+
 // ======== STORING INFORMATION ======== //
 extern const std::string INVALID;
+
+extern const Time INVALID_TIME;
 
 extern std::vector<std::unordered_map<Language, std::string>> R_NAMES;
 extern std::vector<std::unordered_map<Language, std::string>> G_NAMES;
@@ -35,6 +42,12 @@ extern std::vector<std::unordered_map<Language, std::string>> O01_NAMES;
 extern std::vector<std::unordered_map<Language, std::string>> O50_NAMES;
 
 // ======== RETRIEVAL FUNCTIONS ======== //
+bool sameTime(const Time& time1, const Time& time2);
+
+int timeToMins(const Time& time); // Time to mins after 00:00
+Time minsToTime(int mins);
+std::string timeToStr(const Time& time);
+
 bool sameStation(const Station& stn1, const Station& stn2);
 
 bool validStation(const Station& station);

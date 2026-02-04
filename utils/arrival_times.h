@@ -23,14 +23,7 @@ typedef struct train {
     Station train_dest; // final station
 } Train;
 
-typedef struct Time {
-    int hr;
-    int min;
-} Time;
-
 // ======== DEFINITIONS ======== //
-extern const Time INVALID_TIME;
-
 extern const std::vector<std::vector<Time>> BR_FIRST_TRAINS;
 extern const std::vector<std::vector<Time>> BR_LAST_TRAINS;
 
@@ -43,12 +36,6 @@ std::vector<Train> loadStationSchedule(const Station& stn, int day_type); // day
 void printTrainSchedule(const std::vector<Train>& train_schedule);
 
 // ======== QUERY ======== //
-bool sameTime(const Time& time1, const Time& time2);
-
-int timeToMins(const Time& time); // Time to mins after 00:00
-Time minsToTime(int mins);
-std::string timeToStr(const Time& time);
-
 bool oneTrainReachDest(const Station& stn, const Station& dest, Train train);
 
 Time nextTrainTime(const Station& stn, int day_type, const Time& curr_time, const Station& dest); // Returns next arrival time in minutes, or {-1, -1} if none

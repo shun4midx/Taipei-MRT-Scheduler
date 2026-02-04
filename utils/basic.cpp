@@ -21,6 +21,8 @@ const std::unordered_map<std::string, Line> LINES = {
 // ======== DEFINE VARIABLES ======== //
 const std::string INVALID = "N/A";
 
+const Time INVALID_TIME = Time{-1, -1};
+
 // For convenience, we make the array index align with the number of the station (except for orange line, that's an exception, for O50 branch we minus 50)
 std::vector<std::unordered_map<Language, std::string>> R_NAMES = {
     {{zh, INVALID}, {en, INVALID}, {jp, INVALID}, {kr, INVALID}},
@@ -191,6 +193,30 @@ std::vector<std::unordered_map<Language, std::string>> O50_NAMES = {
 };
 
 // ======== RETRIEVAL FUNCTIONS ========= //
+bool sameTime(const Time& time1, const Time& time2) {
+    return time1.hr == time2.hr && time1.min == time2.min;
+}
+
+int timeToMins(const Time& time) {
+    return time.hr * 60 + time.min;
+}
+
+Time minsToTime(int mins) {
+    if (mins < 0 || mins > 26 * 60) { // No train arrives at 2am of the next day I think
+        throw std::invalid_argument("Invalid argument: " + std::to_string(mins));
+    }
+
+    return Time{mins / 60, mins % 60};
+}
+
+std::string timeToStr(const Time& time) {
+    if (sameTime(time, INVALID_TIME)) {
+        return "INVALID_TIME";
+    }
+    
+    return (time.hr < 10 ? "0" : "") + std::to_string(time.hr) + ":" + (time.min < 10 ? "0" : "") + std::to_string(time.min);
+}
+
 bool sameStation(const Station& stn1, const Station& stn2) {
     return stn1.line == stn2.line && stn1.stn_num == stn2.stn_num;
 }
