@@ -48,6 +48,8 @@ int timeToMins(const Time& time); // Time to mins after 00:00
 Time minsToTime(int mins);
 std::string timeToStr(const Time& time);
 
+Time minsAfter(const Time& time, int mins);
+
 bool sameStation(const Station& stn1, const Station& stn2);
 
 bool validStation(const Station& station);

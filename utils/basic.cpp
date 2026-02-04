@@ -217,6 +217,10 @@ std::string timeToStr(const Time& time) {
     return (time.hr < 10 ? "0" : "") + std::to_string(time.hr) + ":" + (time.min < 10 ? "0" : "") + std::to_string(time.min);
 }
 
+Time minsAfter(const Time& time, int mins) {
+    return minsToTime(timeToMins(time) + mins);
+}
+
 bool sameStation(const Station& stn1, const Station& stn2) {
     return stn1.line == stn2.line && stn1.stn_num == stn2.stn_num;
 }
