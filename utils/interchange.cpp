@@ -332,7 +332,7 @@ bool canTransfer(const Station& from, const Station& to) {
     try {
         getTransferTime(from, to);
         return true;
-    } catch (std::exception e) {
+    } catch (const std::exception& e) {
         return false;
     }
 }
