@@ -10,10 +10,16 @@
 #include "basic.h"
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 // ======== DEFINTIONS ======== //
 typedef std::vector<Station> Path;
-typedef std::vector<Time> PathTimes;
+
+typedef std::pair<Time, Time> StationTime; // Arrival and departure time of each station
+
+typedef std::vector<StationTime> PathTimes; 
+
+typedef std::vector<int> PathMins;
 
 // ======== DATA ======== //
 extern const int INVALID_DURATION;
@@ -25,7 +31,6 @@ int getLineDuration(const Station& stn1, const Station& stn2); // One line witho
 
 int perfectPathDuration(const Path& stn_path); // Path including interchanges, but assuming 0 wait time at all steps along the way (Same station but on different lines count as different points on the path for simplicity)
 
-PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type); // Actual path ETA including train waiting time, returns {} if impossible. Every element should be when the user would arrive at that station corr to stn_path, not when the upcoming train arrives.
+PathMins perfectPathETA(const Path& stn_path);
 
-std::string pathTimesToStr(const PathTimes& pt);
-std::string pathToStr(const Path& p);
+PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type); // Actual path ETA including train waiting time, returns {} if impossible. Every element should be when the user would arrive at that station corr to stn_path, not when the upcoming train arrives.

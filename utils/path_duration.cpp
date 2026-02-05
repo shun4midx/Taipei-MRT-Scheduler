@@ -92,7 +92,7 @@ int getLineDuration(const Station& stn1, const Station& stn2) {
     }
 }
 
-int perfectPathDuration(const Path& stn_path) {
+PathMins perfectPathETA(const Path& stn_path) {
     // Invalid input
     if (stn_path.size() < 2) {
         throw std::invalid_argument("stn_path must at least have 2 stations");
@@ -103,7 +103,9 @@ int perfectPathDuration(const Path& stn_path) {
         throw std::invalid_argument("Invalid station stn_path[0]");
     }
 
-    int total_time = 0;
+    PathMins pm;
+
+    pm.push_back(0);
 
     for (int i = 0; i < stn_path.size() - 1; ++i) {// consider i and i+1
         if (!validStation(stn_path[i + 1])) {
@@ -112,20 +114,24 @@ int perfectPathDuration(const Path& stn_path) {
 
         if (stn_path[i].line == stn_path[i + 1].line) { // Take a train
             try {
-                total_time += getLineDuration(stn_path[i], stn_path[i + 1]);
+                pm.push_back(pm.back() + getLineDuration(stn_path[i], stn_path[i + 1]));
             } catch (const std::exception& e) {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
         } else { // Check if it's interchange
             if (canTransfer(stn_path[i], stn_path[i + 1])) {
-                total_time += getTransferTime(stn_path[i], stn_path[i + 1]);
+                pm.push_back(pm.back() + getTransferTime(stn_path[i], stn_path[i + 1]));
             } else {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
         }
     }
 
-    return total_time;
+    return pm;
+}
+
+int perfectPathDuration(const Path& stn_path) {
+    return perfectPathETA(stn_path).back();
 }
 
 PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type) {
@@ -148,10 +154,11 @@ PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type) {
         throw std::invalid_argument("Invalid station stn_path[0]");
     }
 
-    std::vector<Time> arrival_times;
+    PathTimes arrival_times;
 
     // Push first time
-    arrival_times.push_back(curr_time);
+    StationTime temp;
+    temp.first = curr_time;
 
     // Iterate for all remaining times
     for (int i = 0; i < stn_path.size() - 1; ++i) {// consider i and i+1
@@ -162,48 +169,34 @@ PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type) {
         if (stn_path[i].line == stn_path[i + 1].line) { // Take a train
             try {
                 // Calculate train arrival time and then calculate the time it'll take that train to reach i + 1
-                Time arrive_stn_i = nextTrainTime(stn_path[i], day_type, arrival_times.back(), stn_path[i + 1]);
+                // Fill "departure time"
+                temp.second = nextTrainTime(stn_path[i], day_type, temp.first, stn_path[i + 1]);
 
-                arrival_times.push_back(minsAfter(arrive_stn_i, getLineDuration(stn_path[i], stn_path[i + 1])));
+                arrival_times.push_back(temp);
+
+                // Next temp
+                temp.first = minsAfter(temp.second, getLineDuration(stn_path[i], stn_path[i + 1]));
             } catch (const std::exception& e) {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
         } else { // Check if it's interchange
             if (canTransfer(stn_path[i], stn_path[i + 1])) {
-                arrival_times.push_back(minsAfter(arrival_times.back(), getTransferTime(stn_path[i], stn_path[i + 1])));
+                // Fill "departure time"
+                temp.second = temp.first;
+
+                arrival_times.push_back(temp);
+                
+                // Next temp
+                temp.first = minsAfter(temp.second, getTransferTime(stn_path[i], stn_path[i + 1]));
             } else {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
         }
     }
 
+    temp.second = temp.first;
+
+    arrival_times.push_back(temp);
+
     return arrival_times;
-}
-
-std::string pathTimesToStr(const PathTimes& pt) {
-    std::string result = "";
-
-    for (const Time& t : pt) {
-        result += timeToStr(t) + " ";
-    }
-
-    if (result.length() > 0) {
-        result.pop_back();
-    }
-
-    return result;
-}
-
-std::string pathToStr(const Path& p) {
-    std::string result = "";
-
-    for (const Station& stn : p) {
-        result += stationToCode(stn) + " ";
-    }
-
-    if (result.length() > 0) {
-        result.pop_back();
-    }
-
-    return result;
 }
