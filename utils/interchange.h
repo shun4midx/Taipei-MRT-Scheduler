@@ -40,3 +40,5 @@ std::vector<Station> getEquivalentStations(const Station& stn); // All equivalen
 std::string strStnVector(const std::vector<Station>& stn_vec);
 
 std::string strTransfersVector(const std::vector<std::pair<Station, int>>& trans_vec);
+
+std::vector<std::pair<StationNode, int>> getLineTransferStations(Line a, Line b); // Returns stations where you can transfer between the lines
