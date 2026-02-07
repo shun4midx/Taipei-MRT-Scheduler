@@ -391,15 +391,15 @@ std::string strTransfersVector(const std::vector<std::pair<Station, int>>& trans
 }
 
 std::vector<std::pair<StationNode, int>> getLineTransferStations(Line a, Line b) {
-    // Search for line b ones in line a
+    // Search for line a ones in line b
 
     std::vector<std::pair<StationNode, int>> stn_nodes;
 
-    std::vector<std::vector<std::pair<Station, int>>> line_transfers = TRANSFERS.at(a);
+    std::vector<std::vector<std::pair<Station, int>>> line_transfers = TRANSFERS.at(b);
 
     for (const auto& stn_transfers : line_transfers) {
         for (const auto& stn_pair : stn_transfers) {
-            if (stn_pair.first.line == b) {
+            if (stn_pair.first.line == a) {
                 stn_nodes.push_back({*getStationNode(stn_pair.first), stn_pair.second});
             }
         }
