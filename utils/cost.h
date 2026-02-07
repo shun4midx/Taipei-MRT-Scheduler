@@ -5,6 +5,8 @@
  * File: cost.h                             *
  ****************************************** */
 
+#pragma once
+
 #include "utils.h"
 
 #include <unordered_map>
