@@ -28,6 +28,8 @@ typedef struct Time {
     int min;
 } Time;
 
+extern const Station INVALID_STATION;
+
 // ======== STORING INFORMATION ======== //
 extern const std::string INVALID;
 

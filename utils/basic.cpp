@@ -18,6 +18,8 @@ const std::unordered_map<std::string, Line> LINES = {
     {"R", R}, {"O", O}, {"G", G}, {"BL", BL}, {"BR", BR}, {"Y", Y}
 };
 
+const Station INVALID_STATION = Station{R, -1};
+
 // ======== DEFINE VARIABLES ======== //
 const std::string INVALID = "N/A";
 

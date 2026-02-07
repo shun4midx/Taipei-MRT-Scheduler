@@ -11,3 +11,4 @@
 #include "basic.h"
 #include "interchange.h"
 #include "path_duration.h"
+#include "cost.h"
