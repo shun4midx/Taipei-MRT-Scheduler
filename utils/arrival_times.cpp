@@ -224,6 +224,43 @@ Time nextTrainTime(const Station& stn, int day_type, int now_mins, const Station
         throw std::invalid_argument("Invalid station dest");
     }
 
+    // Brown line: Can give worst case approximations based on timeframe
+    if (stn.line == BR && dest.line == BR) {
+        /*
+        平常日（週一至週五）
+        (1) 尖峰時段（07:00～09:00，17:00～19:30）：約2～4分鐘。
+        (2) 離峰時段：約4～10分鐘。
+        (3) 23:00以後：約12分鐘。
+
+        例假日（週六、週日及國定假日）
+        (1) 06:00～23:00：約4～10分鐘。
+        (2) 23:00以後：約12分鐘。
+        */
+
+        Time first_br_train = firstTrainTime(stn, day_type, dest);
+        Time last_br_train = lastTrainTime(stn, day_type, dest);
+
+        if (timeToMins(first_br_train) > now_mins) {
+            return first_br_train;
+        } else if (timeToMins(last_br_train) < now_mins) {
+            return INVALID_TIME;
+        } else { // Normal: just use worst case approximations
+            if (day_type <= 0 || day_type > 7) {
+                throw std::invalid_argument("Invalid day_type: " + std::to_string(day_type));
+            }
+
+            if (now_mins >= timeToMins(Time{23, 0})) {
+                return minsToTime(now_mins + 12);
+            } else if (day_type <= 5 && ((now_mins >= timeToMins(Time{7, 0}) && now_mins <= timeToMins(Time{9, 0})) || (now_mins >= timeToMins(Time{17, 0}) && now_mins <= timeToMins(Time{19, 30})))) {
+                return minsToTime(now_mins + 4);
+            } else {
+                return minsToTime(now_mins + 10);
+            }
+        }
+    }
+
+    // Otherwise
+
     std::vector<Train> train_schedule = loadStationSchedule(stn, day_type);
 
     // Find the closest entry that has time >= now_mins
