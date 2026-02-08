@@ -92,65 +92,45 @@ bool isCheckpoint(const Station& s, const RouteConstraints& c) {
 }
 
 Path simplifyPath(const Path& p, const RouteConstraints& c) {
-    // return p;
     if (p.size() <= 2) {
         return p;
     }
 
     Path out;
-    int run_start = 0;
-
-    auto can_continue = [&](const Station& a, const Station& b) {
-        if (a.line != b.line) {
-            return false;
+    out.push_back(p[0]); // Always add start
+    
+    for (int i = 1; i < p.size() - 1; ++i) {
+        bool must_include = false;
+        
+        // Must include checkpoints
+        if (isCheckpoint(p[i], c)) {
+            must_include = true;
         }
-
-        if (a.line != O) {
-            return true;
+        
+        // Must include if line changes
+        if (p[i - 1].line != p[i].line || p[i].line != p[i + 1].line) {
+            must_include = true;
         }
-
-        return (a.stn_num <= 12 || b.stn_num <= 12) || (a.stn_num >= 50 && (b.stn_num <= 12 || b.stn_num >= 50)) || (a.stn_num < 50 && b.stn_num < 50);
-    };
-
-    bool O12_flag = false;
-
-    for (int i = 1; i < p.size(); ++i) {
-        O12_flag = false;
-
-        // Check O12_flag
-        if (i < p.size() - 1 && i > 1 && p[i - 2].line == O && p[i].line == O) {
-            O12_flag = sameStation(p[i - 1], Station{O, 12}) && ((p[i - 2].stn_num < 50 && p[i].stn_num >= 50) || (p[i - 2].stn_num >= 50 && p[i].stn_num < 50));
-        }
-
-        // Checkpoint or O12 in the corrresponding scenarios (Included in isCheckpoint code)
-        if (isCheckpoint(p[i - 1], c) || O12_flag) {
-            out.push_back(p[run_start]);
-
-            if (run_start != i - 1) {
-                out.push_back(p[i - 1]);
+        
+        // Must include for Orange line branch switches at O12
+        if (p[i].line == O && sameStation(p[i], Station{O, 12})) {
+            bool from_luzhou = (p[i - 1].stn_num >= 50);
+            bool to_luzhou = (p[i + 1].stn_num >= 50);
+            bool from_huilong = (p[i - 1].stn_num >= 13 && p[i - 1].stn_num < 50);
+            bool to_huilong = (p[i + 1].stn_num >= 13 && p[i + 1].stn_num < 50);
+            
+            // Only show O12 if switching between Luzhou and Huilong branches
+            if ((from_luzhou && to_huilong) || (from_huilong && to_luzhou)) {
+                must_include = true;
             }
-            run_start = i;
         }
-
-        // Otherwise
-        else if (!can_continue(p[i - 1], p[i])) {
-            // flush run [run_start, i-1]
-            out.push_back(p[run_start]);
-
-            if (run_start != i - 1) {
-                out.push_back(p[i - 1]);
-            }
-            run_start = i;
+        
+        if (must_include) {
+            out.push_back(p[i]);
         }
     }
-
-    // flush last run
-    out.push_back(p[run_start]);
-
-    if (run_start != p.size() - 1) {
-        out.push_back(p.back());
-    }
-
+    
+    out.push_back(p.back()); // Always add end
     return out;
 }
 
@@ -398,7 +378,9 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
 
         checkpoints.push_back(dst);
 
-        for (const Station& target : checkpoints) {
+        while (checkpoints.size() != 0) {
+            Station target = checkpoints.front();
+
             std::vector<RoutedPath> next_partials;
         
             for (const RoutedPath& base : partials) {
@@ -409,12 +391,13 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
         
                 RouteConstraints segc = constraints;
                 segc.must_lines.clear(); // global constraint
+                segc.must_stations = checkpoints;
         
                 auto segs = routeEngine(base.path.back(), target, base.times.back().first, day_type, segc, k, 6, 100);
         
                 for (const RoutedPath& seg : segs) {
                     RoutedPath combined;
-                    combined.path = mergePaths(base.path, simplifyPath(seg.path, constraints));
+                    combined.path = mergePaths(base.path, simplifyPath(seg.path, segc));
                     combined.times = seg.times; // OK: final ETA recomputed later
                     combined.total_mins = timeToMins(seg.times.back().first) - timeToMins(curr_time);
                     combined.interchange_count = countInterchanges(combined.path);
@@ -439,6 +422,8 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
             // }
 
             partials = std::move(next_partials);
+
+            checkpoints.erase(checkpoints.begin()); // Remove one at a time so we don't waste time on unnecessarily stopping at checkpoints if we stopped before
         }        
 
         partials.erase(
@@ -488,7 +473,13 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
     }
     
     // No must_pass: run normally with adaptive widening
-    return routeEngine(src, dst, curr_time, day_type, constraints, k, 6, 100);
+    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, constraints, k, 6, 100);
+
+    for (RoutedPath& rp : rps) {
+        rp.path = simplifyPath(rp.path, constraints);
+    }
+
+    return rps;
 } 
 
 // ======== CORE ========= //
