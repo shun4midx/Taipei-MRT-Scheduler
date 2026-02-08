@@ -218,7 +218,7 @@ int stationOrderIdx(const Station& s) {
     return -1;
 }
 
-int travelPrice(const Station& s1, const Station& s2) {
+int travelPrice(const Station& s1, const Station& s2, const TicketType& tt) {
     int idx1 = stationOrderIdx(s1);
     int idx2 = stationOrderIdx(s2);
 
@@ -229,5 +229,13 @@ int travelPrice(const Station& s1, const Station& s2) {
     }
 
     // Now idx1 >= idx2
-    return PRICE_TABLE.at(idx1)[idx2];
+    int price = PRICE_TABLE.at(idx1)[idx2];
+
+    if (tt == ADULT) {
+        return price;
+    } else if (tt == CHILD) {
+        return ADULT_TO_CHILD_PRICE.at(price);
+    } else if (tt == ELDERLY) {
+        return ADULT_TO_ELDERLY_PRICE.at(price);
+    }
 }

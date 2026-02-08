@@ -20,7 +20,7 @@ const std::unordered_map<Line, std::string> LINE_EMOJIS = {
 };
 
 const std::unordered_map<Language, std::string> MINS = {
-    {en, "min"},
+    {en, " min"},
     {zh, "分鐘"},
     {jp, "分"},
     {kr, "분"}
@@ -63,12 +63,12 @@ std::string pathTimesToStr(const PathTimes& pt, const Language& lang) {
     return result;
 }
 
-std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang) {
+std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang, const TicketType& tt) {
     if (p.size() != pt.size()) {
         throw std::invalid_argument("Path size != PathTimes size");
     }
 
-    std::string result = "";
+    std::string result = std::to_string(timeToMins(pt.back().second) - timeToMins(pt.front().first)) + MINS.at(lang) + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + "\n";
 
     bool brown_warning = false;
 
@@ -127,12 +127,12 @@ std::string pathMinsToStr(const PathMins& pm) {
     return output;
 }
 
-std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language& lang) {
+std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language& lang, const TicketType& tt) {
     if (p.size() != pm.size()) {
         throw std::invalid_argument("Path size != PathMins size");
     }
 
-    std::string result = "";
+    std::string result = std::to_string(pm.back() - pm.front()) + MINS.at(lang) + + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + "\n";
 
     for (int i = 0; i < p.size(); ++i) {
         result += prettifyStation(p[i], lang) + colon(lang) + std::to_string(pm[i]) + MINS.at(lang) + "\n";
@@ -146,14 +146,14 @@ std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language
 }
 
 // ======== PATH OUTPUTS TO USER ======== //
-std::string pathDetailsToUser(const Path& p, Time begin_time, int day_type, const Language& lang) {
+std::string pathDetailsToUser(const Path& p, Time begin_time, int day_type, const Language& lang, const TicketType& tt) {
     PathTimes pt = pathETA(p, begin_time, day_type);
-    return namedPathTimesToStr(p, pt, lang);
+    return namedPathTimesToStr(p, pt, lang, tt);
 }
 
-std::string pathDetailsToUser(const Path& p, const Language& lang) { // ETA not based on time
+std::string pathDetailsToUser(const Path& p, const Language& lang, const TicketType& tt) { // ETA not based on time
     PathMins pm = perfectPathETA(p);
-    return namedPathMinsToStr(p, pm, lang);
+    return namedPathMinsToStr(p, pm, lang, tt);
 }
 
 // ======== INTERCHANGE I/O TO USER ======== //

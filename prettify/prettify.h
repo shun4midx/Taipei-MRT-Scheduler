@@ -26,15 +26,15 @@ std::string prettifyStation(const Station& stn, const Language& lang = zh);
 // ======== PATH OUTPUTS ======== //
 std::string stationTimeToStr(const StationTime& st, const Language& lang = zh);
 std::string pathTimesToStr(const PathTimes& pt, const Language& lang = zh);
-std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang = zh);
+std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang = zh, const TicketType& tt = ADULT);
 std::string pathToStr(const Path& p);
 std::string pathMinsToStr(const PathMins& pm);
-std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language& lang = zh);
+std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language& lang = zh, const TicketType& tt = ADULT);
 
 // ======== PATH I/O TO USER ======== //
-std::string pathDetailsToUser(const Path& p, Time begin_time, int day_type, const Language& lang = zh);
+std::string pathDetailsToUser(const Path& p, Time begin_time, int day_type, const Language& lang = zh, const TicketType& tt = ADULT);
 
-std::string pathDetailsToUser(const Path& p, const Language& lang = zh); // ETA not based on time
+std::string pathDetailsToUser(const Path& p, const Language& lang = zh, const TicketType& tt = ADULT); // ETA not based on time
 
 // ======== INTERCHANGE I/O TO USER ======== //
 std::string interchangeLinesToUser(const Line& a, const Line& b, const Language& lang = zh); // Get the stations that you can transfer between these lines with

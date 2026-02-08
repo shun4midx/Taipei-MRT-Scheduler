@@ -13,6 +13,8 @@
 #include <vector>
 
 // ======== DEFINITIONS ======== //
+enum TicketType {ADULT, CHILD, ELDERLY};
+
 extern const std::vector<Station> STATION_ORDER;
 
 extern const std::unordered_map<int, int> ADULT_TO_CHILD_PRICE;
@@ -22,4 +24,4 @@ extern const std::vector<std::vector<int>> PRICE_TABLE; // adult price
 
 // ======== FUNCTIONS ======== //
 int stationOrderIdx(const Station& s);
-int travelPrice(const Station& s1, const Station& s2);
+int travelPrice(const Station& s1, const Station& s2, const TicketType& tt = ADULT);
