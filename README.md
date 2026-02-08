@@ -1,7 +1,7 @@
 # Taipei-MRT-Scheduler
 The current Taipei MRT app but with route times in real-time (to the nearest minute without needing Wi-Fi) by accomodating train waiting time, and also providing more variants of MRT routes rather than just the fastest or lowest interchange ones (e.g. not passing certain stations or lines), alongside more requirements to satisfy my "MRT nerd" (捷運迷) self.
 
-# IMPORTANT NOTICE
+# IMPORTANT NOTICE ABOUT R01 (GUANGCI/FENGTIAN TEMPLE)
 Recently, the Taipei MRT has announced it will start to do final testing with the new R01 station called "Guangci/Fengtian Temple". However, since I do not posses the ability to mindread, I have no clue how the new timetables for the stations on the Red Line/Tamsui-Xinyi Line will be affected. I will update my used CSVs when I find new information about the arrival times, but for now, please note that the arrival times are based off of the Taipei MRT before R01 was added. Thank you for your understanding.
 
 # Credits
