@@ -178,7 +178,7 @@ std::vector<std::unordered_map<Language, std::string>> O01_NAMES = {
     {{zh, "台北橋"}, {en, "Taipei Bridge"}, {jp, "台北橋"}, {kr, "타이베이 대교"}}, // O13
     {{zh, "菜寮"}, {en, "Cailiao"}, {jp, "菜寮"}, {kr, "차이랴오"}}, // O14
     {{zh, "三重"}, {en, "Sanchong"}, {jp, "三重"}, {kr, "싼충"}}, // O15
-    {{zh, "先嗇宮"}, {en, "先嗇宮"}, {jp, "先嗇宮"}, {kr, "셴써궁"}}, // O16
+    {{zh, "先嗇宮"}, {en, "Xianse Temple"}, {jp, "先嗇宮"}, {kr, "셴써궁"}}, // O16
     {{zh, "頭前庄"}, {en, "Touqianzhuang"}, {jp, "頭前庄"}, {kr, "터우첸좡"}}, // O17
     {{zh, "新莊"}, {en, "Xinzhuang"}, {jp, "新荘"}, {kr, "신좡"}}, // O18
     {{zh, "輔大"}, {en, "Fu Jen University"}, {jp, "輔仁大学"}, {kr, "푸런 대학교"}}, // O19
