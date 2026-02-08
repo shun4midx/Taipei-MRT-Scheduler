@@ -63,12 +63,50 @@ std::string pathTimesToStr(const PathTimes& pt, const Language& lang) {
     return result;
 }
 
+std::string pathHeaderStr(const Path& p, const PathTimes& pt, const Language& lang, const TicketType& tt) {
+    std::string output = std::to_string(timeToMins(pt.back().second) - timeToMins(pt.front().first)) + MINS.at(lang) + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + " ";
+
+    output += LINE_EMOJIS.at(p[0].line);
+
+    Line curr_line = p[0].line;
+
+    for (auto& stn : p) {
+        if (stn.line != curr_line) {
+            output += LINE_EMOJIS.at(stn.line);
+            curr_line = stn.line;
+        }
+    }
+
+    output += "\n";
+
+    return output;
+}
+
+std::string pathHeaderStr(const Path& p, const PathMins& pm, const Language& lang, const TicketType& tt) {
+    std::string output = std::to_string(pm.back() - pm.front()) + MINS.at(lang) + + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + " ";
+
+    output += LINE_EMOJIS.at(p[0].line);
+
+    Line curr_line = p[0].line;
+
+    for (auto& stn : p) {
+        if (stn.line != curr_line) {
+            output += LINE_EMOJIS.at(stn.line);
+            curr_line = stn.line;
+        }
+    }
+
+    output += "\n";
+
+    return output;
+}
+
 std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang, const TicketType& tt) {
     if (p.size() != pt.size()) {
         throw std::invalid_argument("Path size != PathTimes size");
     }
 
-    std::string result = std::to_string(timeToMins(pt.back().second) - timeToMins(pt.front().first)) + MINS.at(lang) + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + "\n";
+    std::string result = pathHeaderStr(p, pt, lang, tt);
 
     bool brown_warning = false;
 
@@ -132,7 +170,7 @@ std::string namedPathMinsToStr(const Path& p, const PathMins& pm, const Language
         throw std::invalid_argument("Path size != PathMins size");
     }
 
-    std::string result = std::to_string(pm.back() - pm.front()) + MINS.at(lang) + + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + "\n";
+    std::string result = pathHeaderStr(p, pm, lang, tt);
 
     for (int i = 0; i < p.size(); ++i) {
         result += prettifyStation(p[i], lang) + colon(lang) + std::to_string(pm[i]) + MINS.at(lang) + "\n";

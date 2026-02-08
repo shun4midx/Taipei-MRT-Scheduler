@@ -26,6 +26,9 @@ std::string prettifyStation(const Station& stn, const Language& lang = zh);
 // ======== PATH OUTPUTS ======== //
 std::string stationTimeToStr(const StationTime& st, const Language& lang = zh);
 std::string pathTimesToStr(const PathTimes& pt, const Language& lang = zh);
+std::string pathHeaderStr(const Path& p, const PathTimes& pt, const Language& lang = zh, const TicketType& tt = ADULT);
+std::string pathHeaderStr(const Path& p, const PathMins& pm, const Language& lang = zh, const TicketType& tt = ADULT);
+
 std::string namedPathTimesToStr(const Path& p, const PathTimes& pt, const Language& lang = zh, const TicketType& tt = ADULT);
 std::string pathToStr(const Path& p);
 std::string pathMinsToStr(const PathMins& pm);
