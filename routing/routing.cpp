@@ -320,13 +320,7 @@ std::vector<RoutedPath> routeDefault(const Station& src, const Station& dst, Tim
     c.minimize_interchanges = true;
     c.max_interchanges = 4;
 
-    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
-
-    for (auto& rp : rps) {
-        rp.path = simplifyPath(rp.path, c);
-    }
-
-    return rps;
+    return routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);;
 }
 
 // Least interchange: top 3 by interchanges (tie-break by time), fixed candidate budget
@@ -336,13 +330,7 @@ std::vector<RoutedPath> routeLeastInterchange(const Station& src, const Station&
     c.minimize_interchanges = true;
     c.max_interchanges = 4;
 
-    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
-
-    for (auto& rp : rps) {
-        rp.path = simplifyPath(rp.path, c);
-    }
-
-    return rps;
+    return routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
 }
 
 // Custom: supports must/avoid, uses adaptive widening if needed
@@ -473,13 +461,7 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
     }
     
     // No must_pass: run normally with adaptive widening
-    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, constraints, k, 6, 100);
-
-    for (RoutedPath& rp : rps) {
-        rp.path = simplifyPath(rp.path, constraints);
-    }
-
-    return rps;
+    return routeEngine(src, dst, curr_time, day_type, constraints, k, 6, 100);
 } 
 
 // ======== CORE ========= //
@@ -557,10 +539,23 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
             }
         );
 
-        if (routed.size() >= k) {
-            break;
-        }
+        // if (routed.size() >= k) {
+        //     break;
+        // }
     }
+
+    for (auto& rp : routed) {
+        rp.path = simplifyPath(rp.path, constraints);
+        rp.times = pathETA(rp.path, curr_time, day_type);
+        rp.total_mins = timeToMins(rp.times.back().first) - timeToMins(curr_time);
+    }
+
+    // Rank final pool
+    std::sort(routed.begin(), routed.end(),
+        [&](const RoutedPath& a, const RoutedPath& b) {
+            return betterThan(a, b, constraints);
+        }
+    );
 
     if (routed.size() > k) {
         routed.resize(k);
