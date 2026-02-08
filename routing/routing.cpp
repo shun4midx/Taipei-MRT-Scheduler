@@ -340,7 +340,13 @@ std::vector<RoutedPath> routeDefault(const Station& src, const Station& dst, Tim
     c.minimize_interchanges = true;
     c.max_interchanges = 4;
 
-    return routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
+    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
+
+    for (auto& rp : rps) {
+        rp.path = simplifyPath(rp.path, c);
+    }
+
+    return rps;
 }
 
 // Least interchange: top 3 by interchanges (tie-break by time), fixed candidate budget
@@ -350,7 +356,13 @@ std::vector<RoutedPath> routeLeastInterchange(const Station& src, const Station&
     c.minimize_interchanges = true;
     c.max_interchanges = 4;
 
-    return routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
+    std::vector<RoutedPath> rps = routeEngine(src, dst, curr_time, day_type, c, k, 6, 6);
+
+    for (auto& rp : rps) {
+        rp.path = simplifyPath(rp.path, c);
+    }
+
+    return rps;
 }
 
 // Custom: supports must/avoid, uses adaptive widening if needed
