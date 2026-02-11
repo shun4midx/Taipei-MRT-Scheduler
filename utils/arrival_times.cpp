@@ -44,7 +44,7 @@ const std::vector<std::vector<Time>> BR_FIRST_TRAINS = {
     {Time{6, 0}, Time{6, 0}}, // BR21
     {Time{6, 1}, Time{6, 3}}, // BR22
     {Time{6, 3}, Time{6, 1}}, // BR23
-    {Time{6, 0}, INVALID_TIME} // BR24
+    {INVALID_TIME, Time{6, 0}} // BR24
 };
 
 const std::vector<std::vector<Time>> BR_LAST_TRAINS = {
