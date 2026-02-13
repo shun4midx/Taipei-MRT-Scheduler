@@ -486,7 +486,7 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
     std::unordered_set<std::string> seen_paths; // avoid re-evaluating duplicates across budgets
 
     // If src/dst themselves forbidden, no solution.
-    if (forbiddenStation(src, constraints) || forbiddenStation(dst, constraints)) {
+    if (forbiddenStation(src, c) || forbiddenStation(dst, c)) {
         return {};
     }
 
@@ -494,7 +494,7 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
     int cap = std::max(budget, hard_cap);
 
     for (; budget <= cap; budget *= 2) {
-        auto candidates = candidatePaths(src, dst, budget, constraints.max_interchanges, constraints);
+        auto candidates = candidatePaths(src, dst, budget, c.max_interchanges, c);
 
         for (Path& p : candidates) {
             std::string key = hashPath(p);
@@ -524,11 +524,11 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
         }
 
         // Enforce must_lines (global path property) *after* evaluation
-        if (!constraints.must_lines.empty()) {
+        if (!c.must_lines.empty()) {
             routed.erase(
                 std::remove_if(routed.begin(), routed.end(),
                     [&](const RoutedPath& rp) {
-                        for (Line l : constraints.must_lines) {
+                        for (Line l : c.must_lines) {
                             if (!usesLine(rp.path, l)) return true;
                         }
                         return false;
@@ -541,7 +541,7 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
         // Rank current pool
         std::sort(routed.begin(), routed.end(),
             [&](const RoutedPath& a, const RoutedPath& b) {
-                return betterThan(a, b, constraints);
+                return betterThan(a, b, c);
             }
         );
 
@@ -556,7 +556,7 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
     }
 
     for (auto& rp : routed) {
-        rp.path = simplifyPath(rp.path, constraints);
+        rp.path = simplifyPath(rp.path, c);
         rp.times = pathETA(rp.path, curr_time, day_type);
         rp.total_mins = timeToMins(rp.times.back().first) - timeToMins(curr_time);
     }
@@ -564,7 +564,7 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
     // Rank final pool
     std::sort(routed.begin(), routed.end(),
         [&](const RoutedPath& a, const RoutedPath& b) {
-            return betterThan(a, b, constraints);
+            return betterThan(a, b, c);
         }
     );
 
