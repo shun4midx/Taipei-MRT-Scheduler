@@ -95,38 +95,38 @@ Path simplifyPath(const Path& p, const RouteConstraints& c) {
 
     Path out;
     out.push_back(p[0]); // Always add start
-    
+
     for (int i = 1; i < p.size() - 1; ++i) {
         bool must_include = false;
-        
+
         // Must include checkpoints
         if (isCheckpoint(p[i], c)) {
             must_include = true;
         }
-        
+
         // Must include if line changes
         if (p[i - 1].line != p[i].line || p[i].line != p[i + 1].line) {
             must_include = true;
         }
-        
+
         // Must include for Orange line branch switches at O12
         if (p[i].line == O && sameStation(p[i], Station{O, 12})) {
             bool from_luzhou = (p[i - 1].stn_num >= 50);
             bool to_luzhou = (p[i + 1].stn_num >= 50);
             bool from_huilong = (p[i - 1].stn_num >= 13 && p[i - 1].stn_num < 50);
             bool to_huilong = (p[i + 1].stn_num >= 13 && p[i + 1].stn_num < 50);
-            
+
             // Only show O12 if switching between Luzhou and Huilong branches
             if ((from_luzhou && to_huilong) || (from_huilong && to_luzhou)) {
                 must_include = true;
             }
         }
-        
+
         if (must_include) {
             out.push_back(p[i]);
         }
     }
-    
+
     out.push_back(p.back()); // Always add end
     return out;
 }
@@ -143,9 +143,9 @@ Path mergePaths(const Path& a, const Path& b) {
     Path p = a;
 
     if (!sameStation(a.back(), b.front())) {
-        p.insert(p.end(), b.begin(), b.end());   
+        p.insert(p.end(), b.begin(), b.end());
     } else {
-        p.insert(p.end(), b.begin() + 1, b.end());   
+        p.insert(p.end(), b.begin() + 1, b.end());
     }
 
     return p;
@@ -225,7 +225,7 @@ std::vector<Path> candidatePaths(const Station& src, const Station& dst, int max
 
     q.push({src, {src}, 0});
 
-    while (!q.empty() && results.size() < max_paths) {
+    while (!q.empty()) {
         CandState curr = q.front();
         q.pop();
 
@@ -237,7 +237,7 @@ std::vector<Path> candidatePaths(const Station& src, const Station& dst, int max
             results.push_back(curr.path);
 
             if (results.size() >= max_paths) {
-                break;
+                continue;
             }
 
             continue;
@@ -268,21 +268,21 @@ std::vector<Path> candidatePaths(const Station& src, const Station& dst, int max
         // Edge case for O line
         if (sameStation(curr.stn, Station{O, 12})) {
             Station next{O, 50};
-            
+
             if (!validStation(next) || forbiddenStation(next, constraints)) {
                 continue;
             }
-    
+
             // Avoid cycles
             if (stationInList(next, curr.path)) {
                 continue;
             }
-    
+
             Path np = curr.path;
             np.push_back(next);
             q.push({next, np, curr.interchange_count});
         }
-    
+
         // Interchange neighbors
         try {
             auto transfers = getTransfers(curr.stn);
@@ -334,12 +334,12 @@ std::vector<RoutedPath> routeLeastInterchange(const Station& src, const Station&
 std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time curr_time, int day_type, const RouteConstraints& constraints, int k) {
     if (sameStation(src, dst)) {
         return {{
-            .path = {src},
-            .times = {{curr_time, curr_time}},
-            .total_mins = 0,
-            .interchange_count = 0
-        }};
-    }    
+                        .path = {src},
+                        .times = {{curr_time, curr_time}},
+                        .total_mins = 0,
+                        .interchange_count = 0
+                }};
+    }
 
     // If must_pass exists, we do segmented routing:
     // src -> via1 -> via2 -> ... -> dst
@@ -353,10 +353,10 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
 
         // initial empty partial
         partials.push_back(RoutedPath{
-            .path = {src},
-            .times = {{curr_time, curr_time}},
-            .total_mins = 0,
-            .interchange_count = 0
+                .path = {src},
+                .times = {{curr_time, curr_time}},
+                .total_mins = 0,
+                .interchange_count = 0
         });
 
         PathTimes full_times; // optional: we'll re-evaluate full_path at the end for a clean timeline
@@ -367,39 +367,39 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
             Station target = checkpoints.front();
 
             std::vector<RoutedPath> next_partials;
-        
+
             for (const RoutedPath& base : partials) {
                 if (sameStation(base.path.back(), target)) {
                     next_partials.push_back(base);
                     continue;
                 }
-        
+
                 RouteConstraints segc = constraints;
                 segc.must_lines.clear(); // global constraint
                 segc.must_stations = checkpoints;
-        
+
                 auto segs = routeEngine(base.path.back(), target, base.times.back().first, day_type, segc, k, 6, 100);
-        
+
                 for (const RoutedPath& seg : segs) {
                     RoutedPath combined;
                     combined.path = mergePaths(base.path, simplifyPath(seg.path, segc));
                     combined.times = seg.times; // OK: final ETA recomputed later
                     combined.total_mins = timeToMins(seg.times.back().first) - timeToMins(curr_time);
                     combined.interchange_count = countInterchanges(combined.path);
-        
+
                     next_partials.push_back(combined);
                 }
             }
-        
+
             if (next_partials.empty()) {
                 return {};
             }
-        
+
             // Beam prune
             std::sort(next_partials.begin(), next_partials.end(),
-                [&](const RoutedPath& a, const RoutedPath& b) {
-                    return betterThan(a, b, constraints);
-                }
+                    [&](const RoutedPath& a, const RoutedPath& b) {
+                        return betterThan(a, b, constraints);
+                    }
             );
 
             int beam = std::max(k * 5, 10);     // tune
@@ -410,17 +410,17 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
             partials = std::move(next_partials);
 
             checkpoints.erase(checkpoints.begin()); // Remove one at a time so we don't waste time on unnecessarily stopping at checkpoints if we stopped before
-        }        
+        }
 
         partials.erase(
-            std::remove_if(partials.begin(), partials.end(),
-                [&](const RoutedPath& rp) {
-                    for (Line l : constraints.must_lines)
-                        if (!usesLine(rp.path, l)) return true;
-                    return false;
-                }),
-            partials.end()
-        );    
+                std::remove_if(partials.begin(), partials.end(),
+                            [&](const RoutedPath& rp) {
+                                for (Line l : constraints.must_lines)
+                                    if (!usesLine(rp.path, l)) return true;
+                                return false;
+                            }),
+                partials.end()
+        );
 
         // Return results
         std::vector<RoutedPath> results;
@@ -444,23 +444,23 @@ std::vector<RoutedPath> routeCustom(const Station& src, const Station& dst, Time
         if (results.empty()) {
             return {};
         }
-        
+
         std::sort(results.begin(), results.end(),
-            [&](const RoutedPath& a, const RoutedPath& b) {
-                return betterThan(a, b, constraints);
-            }
+                [&](const RoutedPath& a, const RoutedPath& b) {
+                    return betterThan(a, b, constraints);
+                }
         );
-        
+
         if (results.size() > k) {
             results.resize(k);
         }
-        
+
         return results;
     }
-    
+
     // No must_pass: run normally with adaptive widening
     return routeEngine(src, dst, curr_time, day_type, constraints, k, 6, 100);
-} 
+}
 
 // ======== CORE ========= //
 std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time curr_time, int day_type, const RouteConstraints& constraints, int k, int initial_budget, int hard_cap) { // Takes all candidates, evaluates them wrt real time, filter must_lines, then rank
@@ -526,23 +526,23 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
         // Enforce must_lines (global path property) *after* evaluation
         if (!c.must_lines.empty()) {
             routed.erase(
-                std::remove_if(routed.begin(), routed.end(),
-                    [&](const RoutedPath& rp) {
-                        for (Line l : c.must_lines) {
-                            if (!usesLine(rp.path, l)) return true;
-                        }
-                        return false;
-                    }
-                ),
-                routed.end()
+                    std::remove_if(routed.begin(), routed.end(),
+                                [&](const RoutedPath& rp) {
+                                    for (Line l : c.must_lines) {
+                                        if (!usesLine(rp.path, l)) return true;
+                                    }
+                                    return false;
+                                }
+                    ),
+                    routed.end()
             );
         }
 
         // Rank current pool
         std::sort(routed.begin(), routed.end(),
-            [&](const RoutedPath& a, const RoutedPath& b) {
-                return betterThan(a, b, c);
-            }
+                [&](const RoutedPath& a, const RoutedPath& b) {
+                    return betterThan(a, b, c);
+                }
         );
 
         // keep pool small (SUPER important)
@@ -563,9 +563,9 @@ std::vector<RoutedPath> routeEngine(const Station& src, const Station& dst, Time
 
     // Rank final pool
     std::sort(routed.begin(), routed.end(),
-        [&](const RoutedPath& a, const RoutedPath& b) {
-            return betterThan(a, b, c);
-        }
+            [&](const RoutedPath& a, const RoutedPath& b) {
+                return betterThan(a, b, c);
+            }
     );
 
     if (routed.size() > k) {
