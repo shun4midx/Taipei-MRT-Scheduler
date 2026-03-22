@@ -7,7 +7,7 @@
 
 #include "path_duration.h"
 #include "arrival_times.h"
-#include "interchange.h"
+#include "transfer.h"
 #include <stdexcept>
 
 // ======== DATA ======== //
@@ -118,7 +118,7 @@ PathMins perfectPathETA(const Path& stn_path) {
             } catch (const std::exception& e) {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
-        } else { // Check if it's interchange
+        } else { // Check if it's a transfer
             if (canTransfer(stn_path[i], stn_path[i + 1])) {
                 pm.push_back(pm.back() + getTransferTime(stn_path[i], stn_path[i + 1]));
             } else {
@@ -179,7 +179,7 @@ PathTimes pathETA(const Path& stn_path, Time curr_time, int day_type) {
             } catch (const std::exception& e) {
                 throw std::invalid_argument("No valid path from stn_path[" + std::to_string(i) + "] to stn_path[" + std::to_string(i + 1) + "]");
             }
-        } else { // Check if it's interchange
+        } else { // Check if it's a transfer
             if (canTransfer(stn_path[i], stn_path[i + 1])) {
                 // Fill "departure time"
                 temp.second = temp.first;

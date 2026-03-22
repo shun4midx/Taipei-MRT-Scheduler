@@ -2,10 +2,10 @@
  * Copyright (c) 2026 Shun/翔海 (@shun4midx) *
  * Project: Taipei-MRT-Scheduler            *
  * File Type: C++ file                      *
- * File: interchange.cpp                    *
+ * File: transfer.cpp                       *
  ****************************************** */
 
-#include "interchange.h"
+#include "transfer.h"
 #include "basic.h"
 
 #include <stdexcept>
@@ -189,7 +189,7 @@ const std::unordered_map<Line, std::vector<StationNode>> STATION_NODES = {
     }}
 };
 
-// All transfer times in the system [may be edited later, I am basing this off of my memory since I'm not in Taipei right now. I'll fix it when I'm back home in Taipei if there are any parts that are inaccurate, since then I can actually test out each interchange, and I really don't mind that as an MRT nerd! Alternatively, if you're familiar with a station's interchange and think I got the time wrong, please tell me and I'll fix it.]
+// All transfer times in the system
 const std::unordered_map<Line, std::vector<std::vector<std::pair<Station, int>>>> TRANSFERS = {
     // Red line
     {R, {
@@ -246,7 +246,7 @@ const std::unordered_map<Line, std::vector<std::vector<std::pair<Station, int>>>
         {{{Station{G, 12}, 1}}}, // BL11: Ximen
         {{{Station{R, 10}, 4}}}, // BL12: TPEMS
         {}, // BL13
-        {{{Station{O, 7}, 1}}}, // BL14: Zhongxiao Xinsheng
+        {{{Station{O, 7}, 3}}}, // BL14: Zhongxiao Xinsheng
         {{{Station{BR, 10}, 5}}}, // BL15: Zhongxiao Fuxing
         {}, {}, {}, {}, {}, {}, {}, // BL16-22
         {{{Station{BR, 24}, 6}}} // BL23: Nangang exhib center
@@ -292,7 +292,7 @@ const std::unordered_map<Line, std::vector<std::vector<std::pair<Station, int>>>
         {}, // O04
         {{{Station{G, 9}, 1}}}, // O05: Guting
         {{{Station{R, 7}, 1}}}, // O06: Dongmen
-        {{{Station{BL, 14}, 1}}}, // O07: Zhongxiao Xinsheng
+        {{{Station{BL, 14}, 3}}}, // O07: Zhongxiao Xinsheng
         {{{Station{G, 15}, 2}}}, // O08: Songjiang Nanjing
         {}, // O09
         {}, // O10
@@ -316,7 +316,7 @@ const StationNode* getStationNode(const Station& stn) {
     return &STATION_NODES.at(stn.line)[stn.stn_num];
 }
 
-bool isInterchange(const Station& stn) {
+bool isTransfer(const Station& stn) {
     return (getStationNode(stn)->station_codes.size() > 1);
 }
 

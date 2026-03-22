@@ -64,7 +64,7 @@ std::string pathTimesToStr(const PathTimes& pt, const Language& lang) {
 }
 
 std::string pathHeaderStr(const Path& p, const PathTimes& pt, const Language& lang, const TicketType& tt) {
-    std::string output = std::to_string(timeToMins(pt.back().second) - timeToMins(pt.front().first)) + MINS.at(lang) + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + " ";
+    std::string output = std::to_string(timeToMins(pt.back().second) - timeToMins(pt.front().first)) + MINS.at(lang) + " $" + std::to_string(travelPrice(p.front(), p.back(), tt, timeToMins(pt.back().second) - timeToMins(pt.front().first) > 120)) + " ";
 
     if (tt == ADULT) {
         if (lang == en) {
@@ -115,7 +115,7 @@ std::string pathHeaderStr(const Path& p, const PathTimes& pt, const Language& la
 }
 
 std::string pathHeaderStr(const Path& p, const PathMins& pm, const Language& lang, const TicketType& tt) {
-    std::string output = std::to_string(pm.back() - pm.front()) + MINS.at(lang) + + " $" + std::to_string(travelPrice(p.front(), p.back(), tt)) + " ";
+    std::string output = std::to_string(pm.back() - pm.front()) + MINS.at(lang) + + " $" + std::to_string(travelPrice(p.front(), p.back(), tt, (pm.back() - pm.front() > 120))) + " ";
 
     output += LINE_EMOJIS.at(p[0].line);
 
@@ -226,8 +226,8 @@ std::string pathDetailsToUser(const Path& p, const Language& lang, const TicketT
     return namedPathMinsToStr(p, pm, lang, tt);
 }
 
-// ======== INTERCHANGE I/O TO USER ======== //
-std::string interchangeLinesToUser(const Line& a, const Line& b, const Language& lang) {
+// ======== TRANSFER I/O TO USER ======== //
+std::string transferLinesToUser(const Line& a, const Line& b, const Language& lang) {
     std::vector<std::pair<StationNode, int>> int_stns = getLineTransferStations(a, b);
 
     std::string output = "";

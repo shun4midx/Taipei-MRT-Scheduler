@@ -174,7 +174,7 @@ bool oneTrainReachDest(const Station& stn, const Station& dest, Train train) {
     }
 
     // Code
-    if (stn.line != dest.line) { // Need interchange
+    if (stn.line != dest.line) { // Need transfer
         return false;
     }
 
