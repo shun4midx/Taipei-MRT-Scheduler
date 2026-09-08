@@ -203,7 +203,34 @@ const std::vector<std::vector<int>> PRICE_TABLE = {
     {50, 50, 50, 45, 45, 40, 40, 40, 35, 35, 35, 35, 40, 45, 45, 50, 50, 50, 55, 55, 55, 50, 50, 50, 40, 40, 40, 35, 35, 35, 30, 35, 30, 30, 30, 30, 30, 35, 35, 35, 40, 40, 40, 45, 45, 45, 45, 50, 50, 55, 55, 60, 45, 40, 40, 45, 40, 40, 40, 35, 35, 35, 30, 30, 30, 30, 30, 35, 35, 35, 40, 40, 35, 30, 35, 35, 35, 35, 35, 35, 30, 30, 30, 30, 25, 25, 25, 20, 20, 20, 25, 25, 25, 30, 35, 35, 35, 40, 35, 35, 30, 30, 25, 25, 25, 20, 20, 25, 30, 30, 35, 35, 35, 40, 40, 40, 40, 45, 45, 50, 50, 40, 35, 35, 35, 30, 30, 30, 25, 25, 25, 20, 20, 20, 20} // Y20
 };
 
+const std::vector<std::vector<int>> LB_PRICE_TABLE = {
+    {20}, // LB01
+    {20, 20}, // LB02
+    {20, 20, 20}, // LB03
+    {20, 20, 20, 20}, // LB04
+    {20, 20, 20, 20, 20}, // LB05
+    {25, 20, 20, 20, 20, 20}, // LB06
+    {25, 25, 20, 20, 20, 20, 20}, // LB07
+    {30, 30, 25, 25, 25, 20, 20, 20}, // LB08
+    {30, 30, 30, 25, 25, 20, 20, 20, 20}, // LB09
+    {35, 30, 30, 25, 25, 25, 20, 20, 20, 20}, // LB10
+    {35, 35, 30, 30, 30, 25, 25, 20, 20, 20, 20}, // LB11
+    {35, 35, 35, 30, 30, 30, 25, 20, 20, 20, 20, 20} // LB12
+};
+
 // ======== FUNCTIONS ======== //
+int applyTicketType(int adult_price, const TicketType& tt) {
+    if (tt == ADULT) {
+        return adult_price;
+    } else if (tt == CHILD) {
+        return ADULT_TO_CHILD_PRICE.at(adult_price);
+    } else if (tt == ELDERLY) {
+        return ADULT_TO_ELDERLY_PRICE.at(adult_price);
+    }
+
+    throw std::invalid_argument("Invalid TicketType");
+}
+
 int stationOrderIdx(const Station& s) {
     if (!validStation(s)) {
         throw std::invalid_argument("Invalid station s");
@@ -218,7 +245,22 @@ int stationOrderIdx(const Station& s) {
     return -1;
 }
 
-int travelPrice(const Station& s1, const Station& s2, const TicketType& tt, bool exceed120) {
+int lbAdultPrice(const Station& s1, const Station& s2) {
+    if (s1.line != LB || s2.line != LB) {
+        throw std::invalid_argument("lbAdultPrice: both stations must be LB");
+    }
+
+    int idx1 = s1.stn_num - 1;
+    int idx2 = s2.stn_num - 1;
+
+    if (idx1 < idx2) {
+        std::swap(idx1, idx2);
+    }
+
+    return LB_PRICE_TABLE.at(idx1).at(idx2);
+}
+
+int taipeiMetroPrice(const Station& s1, const Station& s2, const TicketType& tt, bool exceed120) {
     // Temporary Guangci/Fengtian Temple fare rule: R01 <-> R02 is free during the promotional period
     if ((sameStation(s1, Station{R, 1}) && sameStation(s2, Station{R, 2})) || (sameStation(s1, Station{R, 2}) && sameStation(s2, Station{R, 1}))) {
         return 0;
@@ -256,4 +298,32 @@ int travelPrice(const Station& s1, const Station& s2, const TicketType& tt, bool
     } else if (tt == ELDERLY) {
         return ADULT_TO_ELDERLY_PRICE.at(price) + (exceed120 ? ADULT_TO_ELDERLY_PRICE.at(20) : 0);
     }
+}
+
+int travelPrice(const Station& s1, const Station& s2, const TicketType& tt, bool exceed120) {
+    bool s1_lb = s1.line == LB;
+    bool s2_lb = s2.line == LB;
+
+    // Neither station is LB: ordinary Taipei Metro fare
+    if (!s1_lb && !s2_lb) {
+        return taipeiMetroPrice(s1, s2, tt, exceed120);
+    }
+
+    // Both stations are LB: Sanying fare only
+    if (s1_lb && s2_lb) {
+        return applyTicketType(lbAdultPrice(s1, s2), tt);
+    }
+
+    // Cross-system journey: Taipei metro terminates at BL01, Sanying side begins at LB01
+    Station metro_stn = s1_lb ? s2 : s1;
+    Station lb_stn = s1_lb ? s1 : s2;
+
+    int metro_price = taipeiMetroPrice(metro_stn, Station{BL, 1}, tt, exceed120);
+
+    int lb_price = applyTicketType(lbAdultPrice(Station{LB, 1}, lb_stn), tt);
+
+    // Transfer discount
+    int discount = (tt == ADULT) ? 8 : 4;
+
+    return std::max(0, metro_price + lb_price - discount);
 }

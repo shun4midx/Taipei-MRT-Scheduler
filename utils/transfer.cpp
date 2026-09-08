@@ -75,7 +75,7 @@ const std::unordered_map<Line, std::vector<StationNode>> STATION_NODES = {
     // Blue Line
     {BL, {
         INVALID_STATION_NODE,
-        StationNode{{Station{BL, 1}}}, // BL01
+        StationNode{{Station{BL, 1}, Station{LB, 1}}}, // BL01: Dingpu
         StationNode{{Station{BL, 2}}}, // BL02
         StationNode{{Station{BL, 3}}}, // BL03
         StationNode{{Station{BL, 4}}}, // BL04
@@ -186,6 +186,23 @@ const std::unordered_map<Line, std::vector<StationNode>> STATION_NODES = {
         StationNode{{Station{O, 52}}}, // O52
         StationNode{{Station{O, 53}}}, // O53
         StationNode{{Station{O, 54}}} // O54
+    }},
+
+    // Light Blue Line
+    {LB, {
+        INVALID_STATION_NODE,
+        StationNode{{Station{LB, 1}, Station{BL, 1}}}, // LB01: Dingpu
+        StationNode{{Station{LB, 2}}}, // LB02
+        StationNode{{Station{LB, 3}}}, // LB03
+        StationNode{{Station{LB, 4}}}, // LB04
+        StationNode{{Station{LB, 5}}}, // LB05
+        StationNode{{Station{LB, 6}}}, // LB06
+        StationNode{{Station{LB, 7}}}, // LB07
+        StationNode{{Station{LB, 8}}}, // LB08
+        StationNode{{Station{LB, 9}}}, // LB09
+        StationNode{{Station{LB, 10}}}, // LB10
+        StationNode{{Station{LB, 11}}}, // LB11
+        StationNode{{Station{LB, 12}}}, // LB12
     }}
 };
 
@@ -238,7 +255,8 @@ const std::unordered_map<Line, std::vector<std::vector<std::pair<Station, int>>>
     // Blue line
     {BL, {
         {},
-        {}, {}, {}, {}, {}, {}, // BL1-6
+        {{{Station{LB, 1}, 4}}}, // BL01: Dingpu
+        {}, {}, {}, {}, {}, // BL2-6
         {{{Station{Y, 16}, 11}}}, // BL07: Banqiao
         {{{Station{Y, 17}, 9}}}, // BL08: Xinpu
         {}, // BL09
@@ -304,6 +322,14 @@ const std::unordered_map<Line, std::vector<std::vector<std::pair<Station, int>>>
         {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, // empty 30-39
         {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, // empty 40-49
         {}, {}, {}, {}, {} // empty 50-54
+    }},
+
+    // Light Blue Line
+    {LB , {
+        {},
+        {{{Station{BL, 1}, 4}}}, // LB01: Dingpu
+        {}, {}, {}, {}, {}, {}, {}, {}, // LB2-9
+        {}, {}, {} // LB10-12
     }}
 };
 

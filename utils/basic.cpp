@@ -11,11 +11,11 @@
 
 // ======== BASIC DEFINITIONS ======== //
 const std::unordered_map<Line, std::string> LINE_TO_STR = {
-    {R, "R"}, {O, "O"}, {G, "G"}, {BL, "BL"}, {BR, "BR"}, {Y, "Y"}
+    {R, "R"}, {O, "O"}, {G, "G"}, {BL, "BL"}, {BR, "BR"}, {Y, "Y"}, {LB, "LB"}
 };
 
 const std::unordered_map<std::string, Line> LINES = {
-    {"R", R}, {"O", O}, {"G", G}, {"BL", BL}, {"BR", BR}, {"Y", Y}
+    {"R", R}, {"O", O}, {"G", G}, {"BL", BL}, {"BR", BR}, {"Y", Y}, {"LB", LB}
 };
 
 const Station INVALID_STATION = Station{R, -1};
@@ -194,6 +194,22 @@ std::vector<std::unordered_map<Language, std::string>> O50_NAMES = {
     {{zh, "蘆洲"}, {en, "Luzhou"}, {jp, "蘆洲"}, {kr, "루저우"}} // O54
 };
 
+std::vector<std::unordered_map<Language, std::string>> LB_NAMES = {
+    {{zh, INVALID}, {en, INVALID}, {jp, INVALID}, {kr, INVALID}},
+    {{zh, "頂埔"}, {en, "Dingpu"}, {jp, "頂埔"}, {kr, "딩푸"}}, // LB01
+    {{zh, "媽祖田"}, {en, "Mazutian"}, {jp, "媽祖田"}, {kr, "마쭈톈"}}, // LB02
+    {{zh, "長壽山"}, {en, "Changshoushan"}, {jp, "長寿山"}, {kr, "창서우산"}}, // LB03
+    {{zh, "橫溪"}, {en, "Hengxi"}, {jp, "横渓"}, {kr, "헝시"}}, // LB04
+    {{zh, "龍埔"}, {en, "Longpu"}, {jp, "龍埔"}, {kr, "룽푸"}}, // LB05
+    {{zh, "三峽"}, {en, "Sanxia"}, {jp, "三峡"}, {kr, "산샤"}}, // LB06
+    {{zh, "臺北大學"}, {en, "National Taipei University"}, {jp, "台北大学"}, {kr, "타이베이대학"}}, // LB07
+    {{zh, "鶯歌車站"}, {en, "Yingge Station"}, {jp, "鶯歌駅"}, {kr, "잉거기차역"}}, // LB08
+    {{zh, "陶瓷老街"}, {en, "Ceramics Old Street"}, {jp, "陶瓷老街"}, {kr, "타오츠라오제"}}, // LB09
+    {{zh, "國華"}, {en, "Guohua"}, {jp, "国華"}, {kr, "궈화"}}, // LB10
+    {{zh, "永吉公園"}, {en, "Yongji Park"}, {jp, "永吉公園"}, {kr, "융지공원"}}, // LB11
+    {{zh, "鶯桃福德"}, {en, "Yingtao Fude"}, {jp, "鶯桃福徳"}, {kr, "잉타오푸더"}} // LB12
+};
+
 // ======== RETRIEVAL FUNCTIONS ========= //
 bool sameTime(const Time& time1, const Time& time2) {
     return time1.hr == time2.hr && time1.min == time2.min;
@@ -254,7 +270,7 @@ std::string getName(const Station& station, int lang_int) {
 
 std::string getName(int line_int, int stn_num, int lang_int) {
     // Detect invalid inputs
-    if (line_int < Line::R || line_int > Line::Y) {
+    if (line_int < Line::R || line_int > Line::LB) {
         throw std::invalid_argument("getName: Invalid Line");
     }
 
@@ -268,7 +284,8 @@ std::string getName(int line_int, int stn_num, int lang_int) {
         {G, &G_NAMES},
         {BL, &BL_NAMES},
         {BR, &BR_NAMES},
-        {Y, &Y_NAMES}
+        {Y, &Y_NAMES},
+        {LB, &LB_NAMES}
     }; // except for O because that's an exception
 
     Line line = static_cast<Line>(line_int);

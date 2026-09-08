@@ -11,7 +11,7 @@
 #include <stdexcept>
 
 // ======== DATA ======== //
-const int INVALID_DURATION = -114514; // I know I'm supposed to take this seriously but I clearly am not
+const int INVALID_DURATION = -0x0BeDead; // I know I'm supposed to take this seriously but I clearly am not
 
 const std::unordered_map<Line, std::vector<int>> LINE_PREFIX_DURATION = {
     // Red line
@@ -60,6 +60,13 @@ const std::unordered_map<Line, std::vector<int>> LINE_PREFIX_DURATION = {
         INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, // empty 30-39
         INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, INVALID_DURATION, // empty 40-49
         29, 32, 33, 35, 38 // O50 to O54
+    }},
+
+    // Light Blue line
+    {LB, {
+        INVALID_DURATION,
+        0, 2, 5, 8, 11, 14, 17, 22, 25, // LB01-09
+        27, 31, 34 // LB10-12
     }}
 };
 

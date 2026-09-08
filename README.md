@@ -7,14 +7,14 @@ The current Taipei MRT app but with route times in real-time (to the nearest min
  - 🟨 Yellow Line/Circular Line
  - 🟩 Green Line/Songshan-Xindian Line
  - 🟦 Blue Line/Bannan Line
- - [IN PROGRESS] 💠 Light Blue Line/Sanying line (#)
+ - 💠 Light Blue Line/Sanying line (#)
  - 🟫 Brown Line/Wenhu Line (*)
 
 (*) Since the brown line isn't consistent with arrival times, I operate this code based on a rough estimate for the worst-case scenario of waiting time given the current timeframe (e.g. late night vs right after work).
 
 (!) The Guangci/Fengtian Temple station was added to the Red Line officially on August 31st, 2026, and for the first four weeks, all rides between Xiangshan and Guangci/Fengtian Temple are counted for free. In other words, no official fare table has been released yet for travel to or from Guangci/Fengtian Temple after these four weeks. Thus, this code operates under the assumption that these rides are still counted for free.
 
-(#) The Sanying Line was added in June, but there is limited official data on its arrival times. Thus, I estimate waiting times using a worst-case scenario given the current timeframe like the brown line.
+(#) The Sanying Line was added in June, but there is limited official data on its arrival times. Thus, I estimate waiting times using a worst-case scenario given the current timeframe like the brown line. Of course, as of right now, only LB01 to LB12 are supported, since LB13 has not been released to the public yet.
 
 # Credits
 I used the [the Taipei MRT publicly available station layouts and network map](https://www.metro.taipei/cp.aspx?n=73B51F32ED23C5E1), and also [the New Taipei Metro publicly provided timetables for the Circular Line](https://www.ntmetro.com.tw/basic/?mode=detail&node=796). I also used the [CSVs provided by the Ministry of Digital Affairs](https://data.gov.tw/en/datasets/131737) for the most recent data on train arrival times for the Taipei MRT.
