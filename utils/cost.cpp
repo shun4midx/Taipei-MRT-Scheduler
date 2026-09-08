@@ -219,8 +219,26 @@ int stationOrderIdx(const Station& s) {
 }
 
 int travelPrice(const Station& s1, const Station& s2, const TicketType& tt, bool exceed120) {
-    int idx1 = stationOrderIdx(s1);
-    int idx2 = stationOrderIdx(s2);
+    // Temporary Guangci/Fengtian Temple fare rule: R01 <-> R02 is free during the promotional period
+    if ((sameStation(s1, Station{R, 1}) && sameStation(s2, Station{R, 2})) || (sameStation(s1, Station{R, 2}) && sameStation(s2, Station{R, 1}))) {
+        return 0;
+    }
+
+    Station fare_s1 = s1;
+    Station fare_s2 = s2;
+
+    // For all other journeys involving R01, temporarily use R02's fare
+    if (sameStation(fare_s1, Station{R, 1})) {
+        fare_s1 = Station{R, 2};
+    }
+
+    if (sameStation(fare_s2, Station{R, 1})) {
+        fare_s2 = Station{R, 2};
+    }
+
+
+    int idx1 = stationOrderIdx(fare_s1);
+    int idx2 = stationOrderIdx(fare_s2);
 
     if (idx1 < idx2) {
         int temp = idx1;

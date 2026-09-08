@@ -18,7 +18,7 @@ const std::unordered_map<Line, std::vector<StationNode>> STATION_NODES = {
     // Red Line
     {R, {
         INVALID_STATION_NODE,
-        INVALID_STATION_NODE,
+        StationNode{{Station{R, 1}}}, // R01: Guangci/Fengtian Temple
         StationNode{{Station{R, 2}}}, // R02: Xiangshan
         StationNode{{Station{R, 3}}}, // R03: Tpe 101
         StationNode{{Station{R, 4}}}, // R04: Xinyi Anhe
