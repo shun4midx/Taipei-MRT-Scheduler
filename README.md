@@ -6,8 +6,8 @@ The current Taipei MRT app but with route times in real-time (to the nearest min
  - 🟧 Orange Line/Zhonghe-Xinlu Line
  - 🟨 Yellow Line/Circular Line
  - 🟩 Green Line/Songshan-Xindian Line
- - 🟦 Blue Line/Bannan Line
  - 💠 Light Blue Line/Sanying line (#)
+ - 🟦 Blue Line/Bannan Line
  - 🟫 Brown Line/Wenhu Line (*)
 
 (*) Since the brown line isn't consistent with arrival times, I operate this code based on a rough estimate for the worst-case scenario of waiting time given the current timeframe (e.g. late night vs right after work).
